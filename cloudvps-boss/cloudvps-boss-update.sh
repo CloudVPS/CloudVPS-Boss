@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-VERSION="1.9.18"
+VERSION="1.9.19"
 DUPLICITY_VERSION="0.7.17"
 TITLE="CloudVPS Boss Upgrade ${VERSION}"
 

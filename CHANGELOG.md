@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.19
+
+- Adds an ignore scripts feature
+- Refer to the backup.conf and README.MD for the functionality. Per default it won't change any functionalities
+
 ## 1.9.18
 
 - Fix cleanup of old Mysql databasedumps 

@@ -20,7 +20,7 @@
 
 set -o pipefail
 
-VERSION="1.9.18"
+VERSION="1.9.19"
 TITLE="CloudVPS Boss Install ${VERSION}"
 
 if [[ ${DEBUG} == "1" ]]; then
