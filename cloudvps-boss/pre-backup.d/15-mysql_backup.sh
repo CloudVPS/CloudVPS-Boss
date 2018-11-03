@@ -190,7 +190,7 @@ rm /var/backups/sql/*.sql.gz # verwijder de oude sql backups
 
 for DB in ${DATABASES}; do
     lecho "Dumping database ${DB} to /var/backups/sql/${DB}.sql.gz"
-    ionice -c2 nice -n19 mysqldump --opt --lock-all-tables --quick --hex-blob --force "${DB}" | ionice -c2 nice -n19 gzip > "/var/backups/sql/${DB}.sql.gz"
+    ionice -c2 nice -n19 mysqldump --opt --single-transaction --quick --hex-blob --force --skip-lock-tables "${DB}" | ionice -c2 nice -n19 gzip > "/var/backups/sql/${DB}.sql.gz"
     if [[ $? -ne 0 ]]; then
         lerror "Database dump ${DB} failed."
     else
