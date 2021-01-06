@@ -348,6 +348,33 @@ EOF
 
 }
 
+install_duplicity_debian_10() {
+    APT_PACKAGES=(
+      util-linux
+      wget
+      dialog
+      libc6
+      git-core
+      python3-keystoneclient
+      python3-swiftclient
+      librsync2
+      duplicity
+    )
+
+    APT_UPDATE="$(apt-get -qq -y --force-yes update > /dev/null 2>&1)"
+    if [[ "$?" -ne 0 ]]; then
+        lerror "'apt-get update' failed."
+        exit 1
+    fi
+
+    APT_INSTALL="$(apt-get -qq -y --force-yes install ${APT_PACKAGES[*]} 2>&1)"
+    if [[ "$?" -ne 0 ]]; then
+        lerror "'apt-get install ${APT_PACKAGES[*]}' failed."
+        exit 1
+    fi
+}
+
+
 install_duplicity_centos_6() {
 
     YUM_CLEAN="$(yum -q -y clean all 2>&1)"
@@ -622,6 +649,10 @@ case "${DISTRO_NAME}" in
 
     "Debian")
         case "${DISTRO_VERSION}" in
+            10)
+                lecho "Debian 10"
+                install_duplicity_debian_10
+                ;;
             9)
                 lecho "Debian 9"
                 install_duplicity_debian_8
@@ -642,8 +673,16 @@ case "${DISTRO_NAME}" in
     ;;
     "Ubuntu")
         # ubuntu has keystoneclient and swiftclient in the repo's.
-        lecho "Ubuntu ${DISTRO_VERSION}"
-        install_duplicity_debian_8
+        case "${DISTRO_VERSION}" in
+            20.*)
+                lecho "Ubuntu ${DISTRO_VERSION}"
+                install_duplicity_debian_10
+		;;
+            *)
+                lecho "Ubuntu ${DISTRO_VERSION}"
+                install_duplicity_debian_8
+                ;;
+        esac
     ;;
     "CentOS")
         case "${DISTRO_VERSION}" in
