@@ -126,7 +126,7 @@ install_packages_debian() {
         lerror "'apt-get update' failed."
         exit 1
     fi
-    for PACKAGE in jq awk sed grep tar gzip which openssl curl wget screen vim haveged unattended-upgrades; do
+    for PACKAGE in jq awk sed grep tar gzip which openssl curl wget screen vim haveged unattended-upgrades bzip2; do
         /usr/bin/apt-get -qq -y --force-yes -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" install "${PACKAGE}" >/dev/null 2>&1
     done
 }
@@ -136,7 +136,7 @@ install_packages_centos() {
 
     yum-config-manager --add-repo https://copr.fedorainfracloud.org/coprs/copart/restic/repo/epel-7/copart-restic-epel-7.repo
 
-    for PACKAGE in jq awk sed grep tar gzip which openssl curl wget screen vim haveged yum-cron restic; do
+    for PACKAGE in jq awk sed grep tar gzip which openssl curl wget screen vim haveged yum-cron restic bzip2; do
         yum -q -y --disablerepo="*" --disableexcludes=main --enablerepo="base" --enablerepo="updates" --enablerepo="copr:copr.fedorainfracloud.org:copart:restic" install "${PACKAGE}" >/dev/null 2>&1
     done
 }
