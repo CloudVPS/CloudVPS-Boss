@@ -8,6 +8,42 @@ We recommend creating a new backup immediately after installing the new version 
 
 Backups made with an older version of CloudVPS-Boss cannot be restored and will not be removed automatically. To avoid paying for stale backups, we suggest manually removing your old backups after about 1–2 weeks.
 
+
+## Installing CloudVPS-Boss V3.0.0
+
+Follow the steps to install CloudVPS-Boss:
+```
+git clone https://github.com/CloudVPS/CloudVPS-Boss.git --branch support-v3-and-use-restic
+cd CloudVPS-Boss
+bash install.sh
+```
+
+We source the entered credentials, as these are required for the next step to create the Restic repository in your ObjectStore project. (You will not receive feedback from your CLI client; this is the expected outcome):
+```
+source /etc/cloudvps-boss-v3/v3-auth.conf
+```
+
+Create a Restic repository using the following command. Use a password and store it securely! You will hopefully never need this password, but it will be required if you ever need to restore a backup. (This password is also needed in the next step):
+```
+restic init -r swift:cloudvps-boss-v3:/
+```
+
+Now place the password you used to create your Restic repository into the following file:
+```
+nano /etc/cloudvps-boss-v3/restic-password.conf
+```
+
+You can now start the backup. By default, backups are created daily. For more information about this, check the next (optional) steps:
+```
+cloudvps-boss
+```
+
+**IMPORTANT!** When you upgrade to the new V3 implementation using the Restic-backup method, your backups will restart. This means that your old backups still exist, but they cannot be restored using Restic.
+
+We recommend creating a new backup immediately after installing the new version to ensure you have a backup that can be restored with Restic.
+
+Backups made with an older version of CloudVPS-Boss cannot be restored and will not be removed automatically. To avoid paying for stale backups, we suggest manually removing your old backups after about 1–2 weeks.
+
 ## Note about this file
 Everything from this point forward is legacy documentation and should be considered outdated. We are keeping it here for historical purposes for now.
 
