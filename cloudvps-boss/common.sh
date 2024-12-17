@@ -44,8 +44,8 @@ if [[ "${EUID}" -ne 0 ]]; then
    exit 1
 fi
 
-if [[ ! -f "/etc/cloudvps-boss/auth.conf" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/auth.conf."
+if [[ ! -f "/etc/cloudvps-boss/v3-auth.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/v3-auth.conf."
     exit 1
 fi
 if [[ ! -f "/etc/cloudvps-boss/backup.conf" ]]; then
@@ -60,7 +60,7 @@ fi
 CONTAINER_NAME="cloudvps-boss"
 BACKUP_BACKEND="swift:${CONTAINER_NAME}:/"
 
-source /etc/cloudvps-boss/auth.conf
+source /etc/cloudvps-boss/v3-auth.conf
 source /etc/cloudvps-boss/backup.conf
 
 TMP="${TEMPDIR}"

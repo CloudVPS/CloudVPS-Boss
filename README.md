@@ -171,7 +171,7 @@ Example install output:
 
     # Username: Example Tenant:user@example.org
     # Auth URL: https://identity.stack.cloudvps.com/v2.0
-    # Written auth config to /etc/cloudvps-boss/auth.conf.
+    # Written auth config to /etc/cloudvps-boss/v3-auth.conf.
     # Checking Swift Container for Backups: https://public.objectstore.eu/v1/22[...]8a/cloudvps-boss-backup/
     # credentials.sh completed.
     # Randomized cronjob time, will run on 4:36.
@@ -205,7 +205,7 @@ If you are on a unsupported distribution you need to to the following things to 
 - Place the required files there, like so:
 
         /etc/cloudvps-boss/
-        |-- auth.conf
+        |-- v3-auth.conf
         |-- backup.conf
         |-- cloudvps-boss-encryption-setup.sh
         |-- cloudvps-boss-restore.sh
@@ -229,7 +229,7 @@ If you are on a unsupported distribution you need to to the following things to 
 
 - Create symlinks in /usr/local/bin to cloudvps-boss, cloudvps-boss-restore, cloudvps-boss-update, cloudvps-list-current-files and cloudvps-boss-stats.
 - Place the cloudvps-boss.cron file in /etc/cron.d/
-- Configure auth.conf and backup.conf. (See below, section Configuration)
+- Configure v3-auth.conf and backup.conf. (See below, section Configuration)
 - Optional, set up encryption.
 
 <a id="ce5"></a>
@@ -269,7 +269,7 @@ Note that full backups have a positive effect on restore speeds, but a negative 
 
 To get 6 months of retention with just one full backup, create a full backup if the other full is older than 6 months (6M) and keep at max 1 full backup.
 
-The auth.conf file has the credentials needed for Swift and Openstack authentication:
+The v3-auth.conf file has the credentials needed for Swift and Openstack authentication:
 
     SWIFT_USERNAME="TENANT-ID:USERNAME"
     SWIFT_PASSWORD="super_secure_password"
@@ -845,7 +845,7 @@ Or you just want to clean up and start over, thus loosing all your backup histor
 
 First source the authentication and common files:
 
-    source /etc/cloudvps-boss/auth.conf
+    source /etc/cloudvps-boss/v3-auth.conf
     source /etc/cloudvps-boss/common.sh
 
 Get a list of all the backup related files from `swift`:
@@ -1274,7 +1274,7 @@ If your container with all the backups is deleted from the oject store you've lo
 
 #### What if my password changed?
 
-You will need to edit `/etc/cloudvps-boss/auth.conf` and place your new password there. Ohterwise you will get errors like these:
+You will need to edit `/etc/cloudvps-boss/v3-auth.conf` and place your new password there. Ohterwise you will get errors like these:
 
     Unauthorised. Check username, password and tenant name/id
     cloudvps-boss: ERROR - Could not upload status
