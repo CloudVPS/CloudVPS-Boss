@@ -1,5 +1,7 @@
-<a id="intro"></a>
+# WARNING
+This version of the CloudVPS Boss documentation is outdated. Please check the [support-v3-and-use-restic](https://github.com/CloudVPS/CloudVPS-Boss/tree/support-v3-and-use-restic) branch which has the most up-to-date version of CloudVPS-Boss.
 
+<a id="intro"></a>
 ### Introduction
 
 CloudVPS Boss is a backup suite for Linux that utilises Duplicity to backup and restore files, folders and databases from and to Openstack Swift with optional encryption, in our case the CloudVPS Object Store.
