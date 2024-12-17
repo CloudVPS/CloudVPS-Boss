@@ -38,9 +38,9 @@ lecho "${TITLE} started on $(date)."
 
 usage() {
     echo "Usage:"
-    echo "To install Cream Cloud Backup with interactive username password question:"
+    echo "To install CloudVPS Boss Backup with interactive username password question:"
     echo "./$0"
-    echo; echo "To install Cream Cloud Backup non-interactive:"
+    echo; echo "To install CloudVPS Boss Backup non-interactive:"
     echo "./$0 username@domain.tld 'passw0rd' 'project id' 'region' 'user domain name' 'project domain name'"
 }
 
@@ -163,6 +163,29 @@ case "${DISTRO_NAME}" in
     lerror "Please install the required packages manually. (jq awk sed grep tar gzip which openssl curl wget screen vim haveged restic)"
     lerror "Instructions on installing restic can be found at https://restic.readthedocs.io/en/stable/020_installation.html"
     exit 1
+    ;;
+esac
+
+echo "Restic is used instead of duplicity for backups. Restic is a modern, fast, secure and efficient backup tool."
+echo "Restic is required for CloudVPS-Boss to work!"
+read -p "Do you want to install Restic (This script is pinned to Restic version 0.17.3 as of 2024-12 the latest version? (Y/N): " PROCEED
+case "$PROCEED" in
+    [Yy]* )
+        lecho "Installing restic version v0.17.3"
+        wget https://github.com/restic/restic/releases/download/v0.17.3/restic_0.17.3_linux_amd64.bz2
+        bzip2 -d restic_0.17.3_linux_amd64.bz2
+        chmod +x restic_0.17.3_linux_amd64
+        mv restic_0.17.3_linux_amd64 /usr/bin/restic
+    ;;
+    [Nn]* )
+        echo "Restic install aborted."
+        echo "Please consult the Restic Github page for installation instructions."
+        echo "https://github.com/restic/restic"
+        # Add your code for aborting the install here
+    ;;
+    * )
+        lerror "Invalid input. Please answer Y or N."
+        exit 1
     ;;
 esac
 
