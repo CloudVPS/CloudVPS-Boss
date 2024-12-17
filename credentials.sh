@@ -37,16 +37,16 @@ if [[ "${EUID}" -ne 0 ]]; then
    exit 1
 fi
 
-if [[ ! -d "/etc/cloudvps-boss" ]]; then
-    mkdir -p "/etc/cloudvps-boss"
+if [[ ! -d "/etc/cloudvps-boss-v3" ]]; then
+    mkdir -p "/etc/cloudvps-boss-v3"
     if [[ $? -ne 0 ]]; then
-        lerror "Cannot create /etc/cloudvps-boss"
+        lerror "Cannot create /etc/cloudvps-boss-v3"
         exit 1
     fi
 fi
 
-if [[ -f "/etc/cloudvps-boss/v3-auth.conf" ]]; then
-    lecho "/etc/cloudvps-boss/v3-auth.conf already exists. Not overwriting it"
+if [[ -f "/etc/cloudvps-boss-v3/v3-auth.conf" ]]; then
+    lecho "/etc/cloudvps-boss-v3/v3-auth.conf already exists. Not overwriting it"
     exit
 fi
 
@@ -120,10 +120,10 @@ if [[ -z "${PROJECT_NAME}" ]]; then
     fi
 fi
 
-if [[ ! -f "/etc/cloudvps-boss/v3-auth.conf" ]]; then
-    touch "/etc/cloudvps-boss/v3-auth.conf"
-    chmod 600 "/etc/cloudvps-boss/v3-auth.conf"
-    cat << EOF > /etc/cloudvps-boss/v3-auth.conf
+if [[ ! -f "/etc/cloudvps-boss-v3/v3-auth.conf" ]]; then
+    touch "/etc/cloudvps-boss-v3/v3-auth.conf"
+    chmod 600 "/etc/cloudvps-boss-v3/v3-auth.conf"
+    cat << EOF > /etc/cloudvps-boss-v3/v3-auth.conf
 export OS_USERNAME="${USERNAME}"
 export OS_PASSWORD="${PASSWORD}"
 export OS_PROJECT_NAME="${PROJECT_NAME}"
@@ -133,9 +133,9 @@ export OS_REGION_NAME=${OS_REGION}
 export OS_AUTH_URL="${OS_BASE_AUTH_URL}"
 export OS_IDENTITY_API_VERSION=3
 EOF
-    lecho "Written auth config to /etc/cloudvps-boss/v3-auth.conf."
+    lecho "Written auth config to /etc/cloudvps-boss-v3/v3-auth.conf."
 else
-    lecho "/etc/cloudvps-boss/v3-auth.conf already exists. Not overwriting it"
+    lecho "/etc/cloudvps-boss-v3/v3-auth.conf already exists. Not overwriting it"
 fi
 
 lecho "Username: ${USERNAME}"
