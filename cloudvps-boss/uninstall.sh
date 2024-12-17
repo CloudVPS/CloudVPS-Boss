@@ -6,7 +6,7 @@
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
 # Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
-VERSION="2.0.0"
+VERSION="3.0.0"
 TITLE="CloudVPS Boss Uninstall ${VERSION}"
 
 if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then

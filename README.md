@@ -1,5 +1,16 @@
 <a id="intro"></a>
 
+
+# Upgrading from Keystone V2 to V3
+When you upgrade to the new V3 implementation using the Restic-backup method, your backups will restart. This means that while your old backups still exist, they cannot be restored using Restic.
+
+We recommend creating a new backup immediately after installing the new version to ensure you have a backup that can be restored with Restic.
+
+Backups made with an older version of CloudVPS-Boss cannot be restored and will not be removed automatically. To avoid paying for stale backups, we suggest manually removing your old backups after about 1–2 weeks.
+
+## Note about this file
+Everything from this point forward is legacy documentation and should be considered outdated. We are keeping it here for historical purposes for now.
+
 ### Introduction
 
 CloudVPS Boss is a backup suite for Linux that utilises Duplicity to backup and restore files, folders and databases from and to Openstack Swift with optional encryption, in our case the CloudVPS Object Store.
