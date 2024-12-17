@@ -1,40 +1,28 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Uninstall ${VERSION}"
 
-if [[ ! -f "/etc/creamcloud-backup/common.sh" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/common.sh"
+if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/common.sh"
     exit 1
 fi
-source /etc/creamcloud-backup/common.sh
+source /etc/cloudvps-boss/common.sh
 
 read -p "Would you like to completely remove CloudVPS Boss? Your backups will NOT be removed. [y/N]? " choice
 
 if [[ "${choice}" = "y" ]]; then
     lecho "Removing CloudVPS Boss"
-    for FILE in "/etc/cron.d/creamcloud-backup"; do
+    for FILE in "/etc/cron.d/cloudvps-boss"; do
         remove_file "${FILE}"
     done
-    for SYMLINK in "/usr/local/bin/creamcloud-backup" "/usr/local/bin/creamcloud-backup-restore" "/usr/local/bin/creamcloud-backup-stats" "/usr/local/bin/creamcloud-backup-list" "/usr/local/bin/creamcloud-backup-update"; do
+    for SYMLINK in "/usr/local/bin/cloudvps-boss" "/usr/local/bin/cloudvps-boss-restore" "/usr/local/bin/cloudvps-boss-stats" "/usr/local/bin/cloudvps-boss-list" "/usr/local/bin/cloudvps-boss-update"; do
         remove_symlink "${SYMLINK}"
     done
     for PIP_INSTALLED in "python-swiftclient" "python-keystoneclient" "argparse" "babel" "debtcollector" "futures" "iso8601" "netaddr" "oslo.config" "oslo.i18n" "oslo.serialization" "oslo.utils" "pbr" "prettytable" "requests" "six" "stevedore"; do
@@ -45,7 +33,7 @@ if [[ "${choice}" = "y" ]]; then
             fi
         done
     done
-    for FOLDER in "/usr/local/creamcloud-backup"  "/etc/creamcloud-backup/"; do
+    for FOLDER in "/usr/local/cloudvps-boss"  "/etc/cloudvps-boss/"; do
         remove_folder "${FOLDER}"
     done
     cd

@@ -1,22 +1,10 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 set -o pipefail
 
@@ -27,16 +15,16 @@ fi
 trap ctrl_c INT
 
 lecho() {
-    logger -t "creamcloud-backup" -- "$1"
+    logger -t "cloudvps-boss" -- "$1"
     echo "# $1"
 }
 
 log() {
-    logger -t "creamcloud-backup" -- "$1"
+    logger -t "cloudvps-boss" -- "$1"
 }
 
 lerror() {
-    logger -t "creamcloud-backup" -- "ERROR - $1"
+    logger -t "cloudvps-boss" -- "ERROR - $1"
     echo "$1" 1>&2
 }
 
@@ -56,32 +44,32 @@ if [[ "${EUID}" -ne 0 ]]; then
    exit 1
 fi
 
-if [[ ! -f "/etc/creamcloud-backup/auth.conf" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/auth.conf."
+if [[ ! -f "/etc/cloudvps-boss/auth.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/auth.conf."
     exit 1
 fi
-if [[ ! -f "/etc/creamcloud-backup/backup.conf" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/backup.conf."
+if [[ ! -f "/etc/cloudvps-boss/backup.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/backup.conf."
     exit 1
 fi
-if [[ ! -f "/etc/creamcloud-backup/restic-password.conf" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/restic-password.conf."
+if [[ ! -f "/etc/cloudvps-boss/restic-password.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/restic-password.conf."
     exit 1
 fi
 
-CONTAINER_NAME="creamcloud-backup"
+CONTAINER_NAME="cloudvps-boss"
 BACKUP_BACKEND="swift:${CONTAINER_NAME}:/"
 
-source /etc/creamcloud-backup/auth.conf
-source /etc/creamcloud-backup/backup.conf
+source /etc/cloudvps-boss/auth.conf
+source /etc/cloudvps-boss/backup.conf
 
 TMP="${TEMPDIR}"
 TEMP="${TEMPDIR}"
 TMPDIR="${TEMPDIR}"
 
-if [[ -f "/etc/creamcloud-backup/custom.conf" ]]; then
-    source "/etc/creamcloud-backup/custom.conf"
-    logger -t "creamcloud-backup" -- "Custom Configuration Loaded"
+if [[ -f "/etc/cloudvps-boss/custom.conf" ]]; then
+    source "/etc/cloudvps-boss/custom.conf"
+    logger -t "cloudvps-boss" -- "Custom Configuration Loaded"
 fi
 
 command_exists() {
@@ -197,8 +185,8 @@ get_file() {
     fi
 }
 
-if [[ ! -d "/etc/creamcloud-backup/status/${HOSTNAME}" ]]; then
-    mkdir -p "/etc/creamcloud-backup/status/${HOSTNAME}"
+if [[ ! -d "/etc/cloudvps-boss/status/${HOSTNAME}" ]]; then
+    mkdir -p "/etc/cloudvps-boss/status/${HOSTNAME}"
     if [[ $? -ne 0 ]]; then
         lerror "Cannot create status folder"
         exit 1
@@ -208,7 +196,7 @@ if [[ ! -d "/etc/creamcloud-backup/status/${HOSTNAME}" ]]; then
     IFS=$'\n'
     RESTIC_OUTPUT=$(restic init / \
         --repo ${BACKUP_BACKEND} \
-        --password-file=/etc/creamcloud-backup/restic-password.conf \
+        --password-file=/etc/cloudvps-boss/restic-password.conf \
         --verbose=1 2>&1 | grep -v -e Warning -e pkg_resources -e oslo -e attr -e kwargs)
 
     if [[ $? -ne 0 ]]; then
@@ -231,6 +219,6 @@ for COMMAND in "awk" "sed" "grep" "tar" "wc" "seq" "gzip" "which" "openssl" "nic
 done
 
 ACTUAL_HOSTNAME="$(get_hostname)"
-logger -t "creamcloud-backup" -- "Configured hostname is ${HOSTNAME}."
-logger -t "creamcloud-backup" -- "Actual hostname is ${ACTUAL_HOSTNAME}."
-logger -t "creamcloud-backup" -- "${TITLE} started on ${HOSTNAME} at $(date)."
+logger -t "cloudvps-boss" -- "Configured hostname is ${HOSTNAME}."
+logger -t "cloudvps-boss" -- "Actual hostname is ${ACTUAL_HOSTNAME}."
+logger -t "cloudvps-boss" -- "${TITLE} started on ${HOSTNAME} at $(date)."

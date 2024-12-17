@@ -1,41 +1,29 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Backup Verify ${VERSION}"
 
-if [[ ! -f "/etc/creamcloud-backup/common.sh" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/common.sh"
+if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/common.sh"
     exit 1
 fi
-source /etc/creamcloud-backup/common.sh
+source /etc/cloudvps-boss/common.sh
 
 lecho "${TITLE} started on ${HOSTNAME} at $(date)."
 
-lecho "restic check --repo ${BACKUP_BACKEND} --password-file=/etc/creamcloud-backup/restic-password.conf --cleanup-cache --verbose=1"
+lecho "restic check --repo ${BACKUP_BACKEND} --password-file=/etc/cloudvps-boss/restic-password.conf --cleanup-cache --verbose=1"
 
 OLD_IFS="${IFS}"
 IFS=$'\n'
 RESTIC_OUTPUT=$(restic check \
     --repo ${BACKUP_BACKEND} \
-    --password-file=/etc/creamcloud-backup/restic-password.conf \
+    --password-file=/etc/cloudvps-boss/restic-password.conf \
     --cleanup-cache \
     --verbose=1 2>&1 | grep -v -e Warning -e pkg_resources -e oslo -e tar -e attr -e kwargs)
 

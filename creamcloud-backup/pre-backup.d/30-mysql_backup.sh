@@ -1,31 +1,19 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 VERSION="2.0.0"
 TITLE="CloudVPS Boss MySQL Backup ${VERSION}"
 
-if [[ ! -f "/etc/creamcloud-backup/common.sh" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/common.sh"
+if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/common.sh"
     exit 1
 fi
-source /etc/creamcloud-backup/common.sh
+source /etc/cloudvps-boss/common.sh
 
 command -v mysql >/dev/null 2>&1
 if [[ $? -ne 0 ]]; then
@@ -54,7 +42,7 @@ This is because the MySQL credentials for the administrative user are incorrect.
 
 You might receive this email after you've changed your MySQL administrative user password (root, da_admin, etc). Please update the /root/.my.cnf file as well. CloudVPS Boss uses this file to access and backup the MySQL databases.
 
-If you've corrected the credentials error and you keep receiving this message, try to remove the file '/etc/creamcloud-backup/mysql_credentials_incorrect'.
+If you've corrected the credentials error and you keep receiving this message, try to remove the file '/etc/cloudvps-boss/mysql_credentials_incorrect'.
 
 Your MySQL databases have not been backupped during this session.
 
@@ -67,10 +55,10 @@ MAIL
 }
 
 send_failed_cred_mail() {
-    if [[ -f "/etc/creamcloud-backup/email.conf" ]]; then
+    if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
         while read recipient; do
              failed_mail
-        done < /etc/creamcloud-backup/email.conf
+        done < /etc/cloudvps-boss/email.conf
     else
         lerror "No email file found. Not mailing."
     fi
@@ -157,18 +145,18 @@ fi
 if [[ -f "/root/.my.cnf" ]]; then
     mysql -e 'SHOW FULL PROCESSLIST;' >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
-        if [[ -f "/etc/creamcloud-backup/mysql_credentials_incorrect" ]]; then
+        if [[ -f "/etc/cloudvps-boss/mysql_credentials_incorrect" ]]; then
                 lerror "MySQL credentials incorrect. Please update /root/.my.cnf with the correct credentials. Emailing user."
                 send_failed_cred_mail
                 exit 1
         else
-            touch /etc/creamcloud-backup/mysql_credentials_incorrect
+            touch /etc/cloudvps-boss/mysql_credentials_incorrect
             lecho "MySQL credentials incorrect. Rebuilding file and retrying."
             mv /root/.my.cnf /root/.my.cnf.$$.bak
-            bash /etc/creamcloud-backup/pre-backup.d/30-mysql_backup.sh
+            bash /etc/cloudvps-boss/pre-backup.d/30-mysql_backup.sh
             if [[ $? -ne 0 ]]; then
                 lecho "Rebuild and retry worked."
-                rm /etc/creamcloud-backup/mysql_credentials_incorrect
+                rm /etc/cloudvps-boss/mysql_credentials_incorrect
                 exit 0
             fi
         fi

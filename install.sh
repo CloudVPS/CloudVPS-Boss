@@ -1,22 +1,10 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 set -o pipefail
 
@@ -28,17 +16,17 @@ if [[ ${DEBUG} == "1" ]]; then
 fi
 
 lecho() {
-    logger -t "creamcloud-backup" -- "$1"
+    logger -t "cloudvps-boss" -- "$1"
     echo "# $1"
 }
 
 lerror() {
-    logger -t "creamcloud-backup" -- "ERROR - $1"
+    logger -t "cloudvps-boss" -- "ERROR - $1"
     echo "$1" 1>&2
 }
 
 log() {
-    logger -t "creamcloud-backup" -- "$1"
+    logger -t "cloudvps-boss" -- "$1"
 }
 
 if [[ "${EUID}" -ne 0 ]]; then
@@ -69,7 +57,7 @@ run_script() {
         log "Starting $1"
         bash "$1" "$2" "$3" "$4"
         if [[ $? == 0 ]]; then
-            logger -t "creamcloud-backup" -- "$1 completed."
+            logger -t "cloudvps-boss" -- "$1 completed."
         else
             lerror "$1 did not exit cleanly."
             exit 1
@@ -185,9 +173,9 @@ done
 # CSF firewall rules for the ObjectStore
 if [[ -f "/etc/csf/csf.fignore" ]]; then
     # Add ourself to the csf file ignore list
-    if ! grep -q 'creamcloud-backup' /etc/csf/csf.fignore; then
+    if ! grep -q 'cloudvps-boss' /etc/csf/csf.fignore; then
         lecho "Adding exceptions for lfd."
-        for path in "/tmp/pip-build-root/*" "/tmp/creamcloud-backup/*" "/usr/local/creamcloud-backup/*" "/etc/creamcloud-backup/*"; do
+        for path in "/tmp/pip-build-root/*" "/tmp/cloudvps-boss/*" "/usr/local/cloudvps-boss/*" "/etc/cloudvps-boss/*"; do
             echo "$path" >> /etc/csf/csf.fignore
         done
         service lfd restart > /dev/null 2>&1
@@ -207,38 +195,38 @@ if [[ -f "/etc/csf/csf.fignore" ]]; then
             csf -a "tcp|out|d=443|d=${IP}" "ObjectStore ($IP)" > /dev/null 2>&1
         fi
     done
-    
+
     # Restart CSF to apply the changes and include the newly added IPs
     service csf restart > /dev/null 2>&1
     csf -r > /dev/null 2>&1
 fi
 
-if [[ -d "/etc/creamcloud-backup" ]]; then
+if [[ -d "/etc/cloudvps-boss" ]]; then
     # check if we already exist, if so, back us up
-    lecho "Backing up /etc/creamcloud-backup to /var/backups/creamcloud-backup.$$"
-    if [[ ! -d "/var/backups/creamcloud-backup.$$" ]]; then
-        mkdir -p "/var/backups/creamcloud-backup.$$"
+    lecho "Backing up /etc/cloudvps-boss to /var/backups/cloudvps-boss.$$"
+    if [[ ! -d "/var/backups/cloudvps-boss.$$" ]]; then
+        mkdir -p "/var/backups/cloudvps-boss.$$"
         if [[ "$?" -ne 0 ]]; then
-            lerror "Cannot create folder /var/backups/creamcloud-backup.$$"
+            lerror "Cannot create folder /var/backups/cloudvps-boss.$$"
         fi
     fi
 
-    cp -r "/etc/creamcloud-backup" "/var/backups/creamcloud-backup.$$"
+    cp -r "/etc/cloudvps-boss" "/var/backups/cloudvps-boss.$$"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot backup /etc/creamcloud-backup to /var/backups/creamcloud-backup.$$."
+        lerror "Cannot backup /etc/cloudvps-boss to /var/backups/cloudvps-boss.$$."
         exit 1
     fi
 
-    if [[ -f "/etc/cron.d/creamcloud-backup" ]]; then
-        cp -r "/etc/cron.d/creamcloud-backup" "/var/backups/creamcloud-backup.$$/creamcloud-backup.cron.bak"
+    if [[ -f "/etc/cron.d/cloudvps-boss" ]]; then
+        cp -r "/etc/cron.d/cloudvps-boss" "/var/backups/cloudvps-boss.$$/cloudvps-boss.cron.bak"
         if [[ "$?" -ne 0 ]]; then
-            lerror "Cannot backup /etc/cron.d/creamcloud-backup to /var/backups/creamcloud-backup.$$/creamcloud-backup.cron.bak."
+            lerror "Cannot backup /etc/cron.d/cloudvps-boss to /var/backups/cloudvps-boss.$$/cloudvps-boss.cron.bak."
             exit 1
         fi
     fi
 fi
 
-for FOLDER in "/etc/creamcloud-backup/pre-backup.d" "/etc/creamcloud-backup/post-backup.d" "/etc/creamcloud-backup/post-fail-backup.d"; do
+for FOLDER in "/etc/cloudvps-boss/pre-backup.d" "/etc/cloudvps-boss/post-backup.d" "/etc/cloudvps-boss/post-fail-backup.d"; do
     # create a few required folders
     if [[ ! -d "${FOLDER}" ]]; then
         mkdir -p "${FOLDER}"
@@ -249,52 +237,52 @@ for FOLDER in "/etc/creamcloud-backup/pre-backup.d" "/etc/creamcloud-backup/post
     fi
 done
 
-log "Extracting to /etc/creamcloud-backup/"
+log "Extracting to /etc/cloudvps-boss/"
 # we copy all the things manually because
 # some users do a chattr +i on stuff they don't want
 # overwritten. A cp -r fails and leaves inconsistent state,
 # a manual copy only fails the chattr'd things.
 for COPY_FILE in "README.md" "LICENSE.md" "CHANGELOG.md"; do
-    cp "${COPY_FILE}" "/etc/creamcloud-backup/${COPY_FILE}"
+    cp "${COPY_FILE}" "/etc/cloudvps-boss/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy ${COPY_FILE} to /etc/creamcloud-backup/${COPY_FILE}."
+        lerror "Cannot copy ${COPY_FILE} to /etc/cloudvps-boss/${COPY_FILE}."
     fi
 done
 
-for COPY_FILE in "creamcloud-backup.cron" "backup.conf" "creamcloud-backup-list.sh" "creamcloud-backup-verify.sh" "creamcloud-backup-cleanup.sh" "creamcloud-backup-restore.sh" "creamcloud-backup.sh" "creamcloud-backup-stats.sh" "creamcloud-backup-update.sh" "common.sh" "exclude.conf" "uninstall.sh"; do
-    cp "creamcloud-backup/${COPY_FILE}" "/etc/creamcloud-backup/${COPY_FILE}"
+for COPY_FILE in "cloudvps-boss.cron" "backup.conf" "cloudvps-boss-list.sh" "cloudvps-boss-verify.sh" "cloudvps-boss-cleanup.sh" "cloudvps-boss-restore.sh" "cloudvps-boss.sh" "cloudvps-boss-stats.sh" "cloudvps-boss-update.sh" "common.sh" "exclude.conf" "uninstall.sh"; do
+    cp "cloudvps-boss/${COPY_FILE}" "/etc/cloudvps-boss/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy creamcloud-backup/${COPY_FILE} to /etc/creamcloud-backup/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "10-upload-starting-status.sh" "20-lockfile_check.sh" "30-mysql_backup.sh"; do
-    cp "creamcloud-backup/pre-backup.d/${COPY_FILE}" "/etc/creamcloud-backup/pre-backup.d/${COPY_FILE}"
+    cp "cloudvps-boss/pre-backup.d/${COPY_FILE}" "/etc/cloudvps-boss/pre-backup.d/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy creamcloud-backup/${COPY_FILE} to /etc/creamcloud-backup/pre-backup.d/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/pre-backup.d/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "10-upload-completed-status.sh"; do
-    cp "creamcloud-backup/post-backup.d/${COPY_FILE}" "/etc/creamcloud-backup/post-backup.d/${COPY_FILE}"
+    cp "cloudvps-boss/post-backup.d/${COPY_FILE}" "/etc/cloudvps-boss/post-backup.d/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy creamcloud-backup/${COPY_FILE} to /etc/creamcloud-backup/post-backup.d/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/post-backup.d/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "10-upload-fail-status.sh" "20-failure-notify.sh"; do
-    cp "creamcloud-backup/post-fail-backup.d/${COPY_FILE}" "/etc/creamcloud-backup/post-fail-backup.d/${COPY_FILE}"
+    cp "cloudvps-boss/post-fail-backup.d/${COPY_FILE}" "/etc/cloudvps-boss/post-fail-backup.d/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy creamcloud-backup/${COPY_FILE} to /etc/creamcloud-backup/post-fail-backup.d/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/post-fail-backup.d/${COPY_FILE}."
     fi
 done
 
 # See if we are upgrading and if so
 # place back the important config files
 for CONF_FILE in "auth.conf" "email.conf" "backup.conf" "custom.conf" "exclude.conf" "encryption.conf"; do
-    if [[ -f "/var/backups/creamcloud-backup.$$/creamcloud-backup/${CONF_FILE}" ]]; then
+    if [[ -f "/var/backups/cloudvps-boss.$$/cloudvps-boss/${CONF_FILE}" ]]; then
         lecho "Update detected. Placing back file ${CONF_FILE}."
-        cp -r "/var/backups/creamcloud-backup.$$/creamcloud-backup/${CONF_FILE}" "/etc/creamcloud-backup/${CONF_FILE}"
+        cp -r "/var/backups/cloudvps-boss.$$/cloudvps-boss/${CONF_FILE}" "/etc/cloudvps-boss/${CONF_FILE}"
     fi
 done
 
@@ -323,14 +311,14 @@ done
 # Hostname is used as the Object Store Container
 HOSTNAME="$(get_hostname)"
 # get and set the hostname in the config. Fails if config is chattr +i.
-sed -i "s/replace_me/${HOSTNAME}/g" /etc/creamcloud-backup/backup.conf
+sed -i "s/replace_me/${HOSTNAME}/g" /etc/cloudvps-boss/backup.conf
 
 if [[ ! -d "/etc/cron.d" ]]; then
     mkdir -p "/etc/cron.d"
 fi
 
-if [[ ! -f "/etc/cron.d/creamcloud-backup" ]]; then
-    mv "/etc/creamcloud-backup/creamcloud-backup.cron" "/etc/cron.d/creamcloud-backup"
+if [[ ! -f "/etc/cron.d/cloudvps-boss" ]]; then
+    mv "/etc/cloudvps-boss/cloudvps-boss.cron" "/etc/cron.d/cloudvps-boss"
     if [[ "$?" -ne 0 ]]; then
         lerror "Cannot place cronjob in /etc/cron.d."
     fi
@@ -338,7 +326,7 @@ if [[ ! -f "/etc/cron.d/creamcloud-backup" ]]; then
     RANDH="$(awk 'BEGIN{srand();print int(rand()*(0-6))+6 }')"
     RANDM="$(awk 'BEGIN{srand();print int(rand()*(0-59))+59 }')"
     # and 0 to 59 for the minutes. Then place it in the cronjob.
-    sed -i -e "s/RANDH/${RANDH}/g" -e "s/RANDM/${RANDM}/g" /etc/cron.d/creamcloud-backup
+    sed -i -e "s/RANDH/${RANDH}/g" -e "s/RANDM/${RANDM}/g" /etc/cron.d/cloudvps-boss
     # and show the user
     lecho "Randomized cronjob time, will run on ${RANDH}:${RANDM}."
 fi
@@ -347,21 +335,21 @@ if [[ ! -d "/usr/local/bin" ]]; then
     mkdir -p "/usr/local/bin"
 fi
 
-for COMMAND in "creamcloud-backup.sh" "creamcloud-backup-cleanup.sh" "creamcloud-backup-list.sh" "creamcloud-backup-restore.sh" "creamcloud-backup-stats.sh" "creamcloud-backup-update.sh" "creamcloud-backup-verify.sh"; do
-    log "Creating symlink for /etc/creamcloud-backup/${COMMAND} in /usr/local/bin/${COMMAND%.sh}."
-    chmod +x "/etc/creamcloud-backup/${COMMAND}"
-    ln -fs "/etc/creamcloud-backup/${COMMAND}" "/usr/local/bin/${COMMAND%.sh}"
+for COMMAND in "cloudvps-boss.sh" "cloudvps-boss-cleanup.sh" "cloudvps-boss-list.sh" "cloudvps-boss-restore.sh" "cloudvps-boss-stats.sh" "cloudvps-boss-update.sh" "cloudvps-boss-verify.sh"; do
+    log "Creating symlink for /etc/cloudvps-boss/${COMMAND} in /usr/local/bin/${COMMAND%.sh}."
+    chmod +x "/etc/cloudvps-boss/${COMMAND}"
+    ln -fs "/etc/cloudvps-boss/${COMMAND}" "/usr/local/bin/${COMMAND%.sh}"
 done
 
 for FILE in "pre-backup.d/30-mysql_backup.sh" "post-backup.d/10-upload-completed-status.sh" "pre-backup.d/10-upload-starting-status.sh" "pre-backup.d/20-lockfile_check.sh" "post-fail-backup.d/10-upload-fail-status.sh" "post-fail-backup.d/20-failure-notify.sh"; do
     # make sure all files are executable
-    chmod +x "/etc/creamcloud-backup/${FILE}"
+    chmod +x "/etc/cloudvps-boss/${FILE}"
 done
 
 echo
 lecho "If you want to receive email notifications of issues, please install"
 lecho "a mailserver and add email addresses, one per line, to the following"
-lecho "file: /etc/creamcloud-backup/email.conf"
+lecho "file: /etc/cloudvps-boss/email.conf"
 echo
 lecho "CloudVPS Boss installation completed."
 echo

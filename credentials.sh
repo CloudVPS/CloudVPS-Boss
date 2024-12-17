@@ -1,22 +1,10 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 set -o pipefail
 
@@ -35,12 +23,12 @@ usage() {
 }
 
 lecho() {
-    logger -t "creamcloud-backup" -- "$1"
+    logger -t "cloudvps-boss" -- "$1"
     echo "# $1"
 }
 
 lerror() {
-    logger -t "creamcloud-backup" -- "ERROR - $1"
+    logger -t "cloudvps-boss" -- "ERROR - $1"
     echo "$1" 1>&2
 }
 
@@ -49,16 +37,16 @@ if [[ "${EUID}" -ne 0 ]]; then
    exit 1
 fi
 
-if [[ ! -d "/etc/creamcloud-backup" ]]; then
-    mkdir -p "/etc/creamcloud-backup"
+if [[ ! -d "/etc/cloudvps-boss" ]]; then
+    mkdir -p "/etc/cloudvps-boss"
     if [[ $? -ne 0 ]]; then
-        lerror "Cannot create /etc/creamcloud-backup"
+        lerror "Cannot create /etc/cloudvps-boss"
         exit 1
     fi
 fi
 
-if [[ -f "/etc/creamcloud-backup/auth.conf" ]]; then
-    lecho "/etc/creamcloud-backup/auth.conf already exists. Not overwriting it"
+if [[ -f "/etc/cloudvps-boss/auth.conf" ]]; then
+    lecho "/etc/cloudvps-boss/auth.conf already exists. Not overwriting it"
     exit
 fi
 
@@ -132,10 +120,10 @@ if [[ -z "${PROJECT_NAME}" ]]; then
     fi
 fi
 
-if [[ ! -f "/etc/creamcloud-backup/auth.conf" ]]; then
-    touch "/etc/creamcloud-backup/auth.conf"
-    chmod 600 "/etc/creamcloud-backup/auth.conf"
-    cat << EOF > /etc/creamcloud-backup/auth.conf
+if [[ ! -f "/etc/cloudvps-boss/auth.conf" ]]; then
+    touch "/etc/cloudvps-boss/auth.conf"
+    chmod 600 "/etc/cloudvps-boss/auth.conf"
+    cat << EOF > /etc/cloudvps-boss/auth.conf
 export OS_USERNAME="${USERNAME}"
 export OS_PASSWORD="${PASSWORD}"
 export OS_PROJECT_NAME="${PROJECT_NAME}"
@@ -145,16 +133,16 @@ export OS_REGION_NAME=${OS_REGION}
 export OS_AUTH_URL="${OS_BASE_AUTH_URL}"
 export OS_IDENTITY_API_VERSION=3
 EOF
-    lecho "Written auth config to /etc/creamcloud-backup/auth.conf."
+    lecho "Written auth config to /etc/cloudvps-boss/auth.conf."
 else
-    lecho "/etc/creamcloud-backup/auth.conf already exists. Not overwriting it"
+    lecho "/etc/cloudvps-boss/auth.conf already exists. Not overwriting it"
 fi
 
 lecho "Username: ${USERNAME}"
 lecho "Auth URL: ${OS_BASE_AUTH_URL}"
-lecho "Checking Swift Container for Backups: https://public.objectstore.eu/v1/${PROJECT_ID}/creamcloud-backup/"
+lecho "Checking Swift Container for Backups: https://public.objectstore.eu/v1/${PROJECT_ID}/cloudvps-boss/"
 
-curl -s -o /dev/null -X PUT -T "/etc/hosts" --user "${USERNAME}:${PASSWORD}" "https://public.objectstore.eu/v1/${PROJECT_ID}/creamcloud-backup/"
+curl -s -o /dev/null -X PUT -T "/etc/hosts" --user "${USERNAME}:${PASSWORD}" "https://public.objectstore.eu/v1/${PROJECT_ID}/cloudvps-boss/"
 if [[ $? == 60 ]]; then
     # CentOS 5...
     lecho "Curl error Peer certificate cannot be authenticated with known CA certificates."

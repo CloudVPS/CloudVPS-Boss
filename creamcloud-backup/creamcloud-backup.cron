@@ -1,30 +1,21 @@
+# Restic wrapper to back up to OpenStack Object Store
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 # Replace root with your email address to receive backup reports.
 MAILTO="root"
 
 # CloudVPS Boss Cleanup
-0 0 * * * root /usr/local/bin/creamcloud-backup-cleanup
+0 0 * * * root /usr/local/bin/cloudvps-boss-cleanup
 
 # CloudVPS Boss Backup
-RANDM RANDH * * * root /usr/local/bin/creamcloud-backup
+RANDM RANDH * * * root /usr/local/bin/cloudvps-boss
 
 # CloudVPS Boss Update
-0 1 1 * * root /usr/local/bin/creamcloud-backup-update
+# NOTE: (houtknots) Disabled since we will not update the script in to repo
+# anymore and we want to avoid conflicts with the older branches.
+# 0 1 1 * * root /usr/local/bin/cloudvps-boss-update

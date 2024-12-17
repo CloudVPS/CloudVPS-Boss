@@ -242,14 +242,6 @@ Another step we take on this distro, if needed, is updating the system root CA c
 
 For all CentOS releases, we disable all the repositories except `base` during installation. The script installs the `epel` repository and uses this for the python packages. If you run RHEL, Scientific Linux or Oracle Linux, make sure you either enable or rename the repository which contains base packages to `base` otherwise the installation will fail.
 
-<a id="arc"></a>
-
-#### Notes Arch Linux
-
-Arch Linux is not supported, but we do provide a (as of August 2014) working installer. It however fails if you have gcc-multilib installed. Install the required packages manually then.
-
-<a id="con"></a>
-
 ### Configuration
 
 The install script creates a default configuration for the backup process, with these settings in it:
@@ -1407,7 +1399,7 @@ If the restore script looks weird like above and you are running in a `screen` s
 ### License
 
     CloudVPS Boss - Duplicity wrapper to back up to OpenStack Swift, Object
-    Store. Copyright (C) 2014 CloudVPS.
+    Store. Copyright (C) 2014 CloudVPS & Cream Commerce B.V.
     Author: Remy van Elst, https://raymii.org
 
 
@@ -1430,6 +1422,8 @@ Also see LICENSE.md for full text of GPLv2.
 ### Authors
 
 - Code: [Remy van Elst](https://raymii.org)
-- Code review: [Koert van der Veer](http://blog.ondergetekende.nl)
+- Code: CloudVPS B.V.
+- Code: Cream Commerce B.V.
+- Code: Houtknots
 - Control Panel MySQL credential code adapted from work by Jeffrey Langerak
 

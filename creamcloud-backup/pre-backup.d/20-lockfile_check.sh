@@ -1,31 +1,19 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Lockfile Check ${VERSION}"
 
-if [[ ! -f "/etc/creamcloud-backup/common.sh" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/common.sh"
+if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/common.sh"
     exit 1
 fi
-source /etc/creamcloud-backup/common.sh
+source /etc/cloudvps-boss/common.sh
 
 DUPLICITY_LOCKFILE="$(find /root/.cache/duplicity -iname '*.lock' 2>&1 | head -n 1)"
 
@@ -58,10 +46,10 @@ MAIL
 }
 
 send_greater_than_24hour_mail() {
-    if [[ -f "/etc/creamcloud-backup/email.conf" ]]; then
+    if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
         while read recipient; do
              greater_than_24hour_mail
-        done < /etc/creamcloud-backup/email.conf
+        done < /etc/cloudvps-boss/email.conf
     else
         lerror "No email file found. Not mailing"
     fi
@@ -98,10 +86,10 @@ MAIL
 }
 
 send_less_than_24hour_mail() {
-    if [[ -f "/etc/creamcloud-backup/email.conf" ]]; then
+    if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
         while read recipient; do
              less_than_24hour_mail
-        done < /etc/creamcloud-backup/email.conf
+        done < /etc/cloudvps-boss/email.conf
     else
         lerror "No email file found. Not mailing"
     fi
@@ -137,7 +125,7 @@ if [[ ! -z "${DUPLICITY_LOCKFILE}" ]]; then
                 fi
             else
                 echo "Duplicity is still running. Seems OK."
-                touch /etc/creamcloud-backup/status/24h
+                touch /etc/cloudvps-boss/status/24h
                 send_less_than_24hour_mail
             fi
         fi

@@ -1,35 +1,23 @@
 #!/bin/bash
+# Restic wrapper to back up to OpenStack Object Store
+# Credits to Cream Commerce B.V. for their work on the restic implementation.
 #
-#        ▄▄███████▄▄
-#     ▄███████████████▄
-#   ▄███▐███▀▀▄▄▄▄▀▀████▄
-#  ████▐██ ███▀▀▀███▄▀███▌   ▄█████▄ ██▄▄███▌ ▄█████▄  ▄██████▄ ██▌▄████▄▄████▄
-# ▐███▌██ ██       ██▌████  ▐███   ▀ ▀███▀▀▀ ███▀  ███ ▀▀   ███  ███▀▀████▀▀███▌
-# ▐███▌██ ▀█     █ ▐██▐███  ▐██▌     ▐██▌    █████████ ▄███████▌ ███   ███  ▐██▌
-# ▐████▄▀█▄ ▀▀  ▄█ ███▐███  ▐██▌     ▐██▌    ███      ▐███   ██▌ ███   ███  ▐██▌
-#  █████▌▀▀████▀▀ ███▐███▌   ▀█████▀ ▐██▌    ▀███████▀ █████████ ███   ██▌   ██▌
-#   ▀██████▄▄▄▄█████▐███▀
-#     ▀███████████████▀
-#        ▀▀███████▀▀
-#
-# ------------------------------------------------------------------------------
-# Cream Cloud Backup - Restic wrapper to back up to OpenStack Object Store
-#
+# Copyright (C):          CloudVPS B.V.
 # Copyright (C):          Cream Commerce B.V., https://www.cream.nl/
-# Based on the work of:   Remy van Elst, https://raymii.org/
+# Based on the work of:   Remy van Elst, https://raymii.org/, CloudVPS B.V. & Cream Commerce B.V.
 
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Failure Notify ${VERSION}"
 
-if [[ ! -f "/etc/creamcloud-backup/common.sh" ]]; then
-    lerror "Cannot find /etc/creamcloud-backup/common.sh"
+if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss/common.sh"
     exit 1
 fi
-source /etc/creamcloud-backup/common.sh
+source /etc/cloudvps-boss/common.sh
 
-if [[ -f "/etc/creamcloud-backup/status/24h" ]]; then
+if [[ -f "/etc/cloudvps-boss/status/24h" ]]; then
     lecho "24 hour backup file found. Not sending email, removing file."
-    rm "/etc/creamcloud-backup/status/24h"
+    rm "/etc/cloudvps-boss/status/24h"
     exit 0
 fi
 
@@ -43,12 +31,12 @@ getlogging() {
         tail -n 200  /var/log/restic.log
     else
         if [[ -f "/var/log/messages" ]]; then
-            lecho "10 most recent lines with creamcloud-backup ERROR in /var/log/messages:"
-            grep "creamcloud-backup: ERROR" /var/log/messages | tail -n 10
+            lecho "10 most recent lines with cloudvps-boss ERROR in /var/log/messages:"
+            grep "cloudvps-boss: ERROR" /var/log/messages | tail -n 10
         fi
         if [[ -f "/var/log/syslog" ]]; then
-            lecho "10 most recent lines with creamcloud-backup ERROR in /var/log/syslog:"
-            grep "creamcloud-backup: ERROR" /var/log/syslog | tail -n 10
+            lecho "10 most recent lines with cloudvps-boss ERROR in /var/log/syslog:"
+            grep "cloudvps-boss: ERROR" /var/log/syslog | tail -n 10
         fi
     fi
 
@@ -66,7 +54,7 @@ Object Store has not succeeded on date: $(date) (server date/time).
 Here is some information:
 
 ===== BEGIN CLOUDVPS BOSS STATS =====
-$(creamcloud-backup-stats)
+$(cloudvps-boss-stats)
 ===== END CLOUDVPS BOSS STATS =====
 
 ===== BEGIN CLOUDVPS BOSS ERROR LOG =====
@@ -85,10 +73,10 @@ CloudVPS Boss
 MAIL
 }
 
-if [[ -f "/etc/creamcloud-backup/email.conf" ]]; then
+if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
     while read recipient; do
          errormail
-    done < /etc/creamcloud-backup/email.conf
+    done < /etc/cloudvps-boss/email.conf
 else
     lerror "No email file found. Not mailing"
 fi
