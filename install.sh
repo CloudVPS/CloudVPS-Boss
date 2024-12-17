@@ -175,7 +175,7 @@ if [[ -f "/etc/csf/csf.fignore" ]]; then
     # Add ourself to the csf file ignore list
     if ! grep -q 'cloudvps-boss' /etc/csf/csf.fignore; then
         lecho "Adding exceptions for lfd."
-        for path in "/tmp/pip-build-root/*" "/tmp/cloudvps-boss/*" "/usr/local/cloudvps-boss/*" "/etc/cloudvps-boss/*"; do
+        for path in "/tmp/pip-build-root/*" "/tmp/cloudvps-boss/*" "/usr/local/cloudvps-boss/*" "/etc/cloudvps-boss-v3/*"; do
             echo "$path" >> /etc/csf/csf.fignore
         done
         service lfd restart > /dev/null 2>&1
@@ -201,9 +201,9 @@ if [[ -f "/etc/csf/csf.fignore" ]]; then
     csf -r > /dev/null 2>&1
 fi
 
-if [[ -d "/etc/cloudvps-boss" ]]; then
+if [[ -d "/etc/cloudvps-boss-v3" ]]; then
     # check if we already exist, if so, back us up
-    lecho "Backing up /etc/cloudvps-boss to /var/backups/cloudvps-boss.$$"
+    lecho "Backing up /etc/cloudvps-boss-v3 to /var/backups/cloudvps-boss.$$"
     if [[ ! -d "/var/backups/cloudvps-boss.$$" ]]; then
         mkdir -p "/var/backups/cloudvps-boss.$$"
         if [[ "$?" -ne 0 ]]; then
@@ -211,9 +211,9 @@ if [[ -d "/etc/cloudvps-boss" ]]; then
         fi
     fi
 
-    cp -r "/etc/cloudvps-boss" "/var/backups/cloudvps-boss.$$"
+    cp -r "/etc/cloudvps-boss-v3" "/var/backups/cloudvps-boss.$$"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot backup /etc/cloudvps-boss to /var/backups/cloudvps-boss.$$."
+        lerror "Cannot backup /etc/cloudvps-boss-v3 to /var/backups/cloudvps-boss.$$."
         exit 1
     fi
 
@@ -226,7 +226,7 @@ if [[ -d "/etc/cloudvps-boss" ]]; then
     fi
 fi
 
-for FOLDER in "/etc/cloudvps-boss/pre-backup.d" "/etc/cloudvps-boss/post-backup.d" "/etc/cloudvps-boss/post-fail-backup.d"; do
+for FOLDER in "/etc/cloudvps-boss-v3/pre-backup.d" "/etc/cloudvps-boss-v3/post-backup.d" "/etc/cloudvps-boss-v3/post-fail-backup.d"; do
     # create a few required folders
     if [[ ! -d "${FOLDER}" ]]; then
         mkdir -p "${FOLDER}"
@@ -237,52 +237,52 @@ for FOLDER in "/etc/cloudvps-boss/pre-backup.d" "/etc/cloudvps-boss/post-backup.
     fi
 done
 
-log "Extracting to /etc/cloudvps-boss/"
+log "Extracting to /etc/cloudvps-boss-v3/"
 # we copy all the things manually because
 # some users do a chattr +i on stuff they don't want
 # overwritten. A cp -r fails and leaves inconsistent state,
 # a manual copy only fails the chattr'd things.
 for COPY_FILE in "README.md" "LICENSE.md" "CHANGELOG.md"; do
-    cp "${COPY_FILE}" "/etc/cloudvps-boss/${COPY_FILE}"
+    cp "${COPY_FILE}" "/etc/cloudvps-boss-v3/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy ${COPY_FILE} to /etc/cloudvps-boss/${COPY_FILE}."
+        lerror "Cannot copy ${COPY_FILE} to /etc/cloudvps-boss-v3/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "cloudvps-boss.cron" "backup.conf" "cloudvps-boss-list.sh" "cloudvps-boss-verify.sh" "cloudvps-boss-cleanup.sh" "cloudvps-boss-restore.sh" "cloudvps-boss.sh" "cloudvps-boss-stats.sh" "cloudvps-boss-update.sh" "common.sh" "exclude.conf" "uninstall.sh"; do
-    cp "cloudvps-boss/${COPY_FILE}" "/etc/cloudvps-boss/${COPY_FILE}"
+    cp "cloudvps-boss/${COPY_FILE}" "/etc/cloudvps-boss-v3/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss-v3/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "10-upload-starting-status.sh" "20-lockfile_check.sh" "30-mysql_backup.sh"; do
-    cp "cloudvps-boss/pre-backup.d/${COPY_FILE}" "/etc/cloudvps-boss/pre-backup.d/${COPY_FILE}"
+    cp "cloudvps-boss/pre-backup.d/${COPY_FILE}" "/etc/cloudvps-boss-v3/pre-backup.d/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/pre-backup.d/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss-v3/pre-backup.d/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "10-upload-completed-status.sh"; do
-    cp "cloudvps-boss/post-backup.d/${COPY_FILE}" "/etc/cloudvps-boss/post-backup.d/${COPY_FILE}"
+    cp "cloudvps-boss/post-backup.d/${COPY_FILE}" "/etc/cloudvps-boss-v3/post-backup.d/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/post-backup.d/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss-v3/post-backup.d/${COPY_FILE}."
     fi
 done
 
 for COPY_FILE in "10-upload-fail-status.sh" "20-failure-notify.sh"; do
-    cp "cloudvps-boss/post-fail-backup.d/${COPY_FILE}" "/etc/cloudvps-boss/post-fail-backup.d/${COPY_FILE}"
+    cp "cloudvps-boss/post-fail-backup.d/${COPY_FILE}" "/etc/cloudvps-boss-v3/post-fail-backup.d/${COPY_FILE}"
     if [[ "$?" -ne 0 ]]; then
-        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss/post-fail-backup.d/${COPY_FILE}."
+        lerror "Cannot copy cloudvps-boss/${COPY_FILE} to /etc/cloudvps-boss-v3/post-fail-backup.d/${COPY_FILE}."
     fi
 done
 
 # See if we are upgrading and if so
 # place back the important config files
-for CONF_FILE in "auth.conf" "email.conf" "backup.conf" "custom.conf" "exclude.conf" "encryption.conf"; do
+for CONF_FILE in "v3-auth.conf" "email.conf" "backup.conf" "custom.conf" "exclude.conf" "encryption.conf"; do
     if [[ -f "/var/backups/cloudvps-boss.$$/cloudvps-boss/${CONF_FILE}" ]]; then
         lecho "Update detected. Placing back file ${CONF_FILE}."
-        cp -r "/var/backups/cloudvps-boss.$$/cloudvps-boss/${CONF_FILE}" "/etc/cloudvps-boss/${CONF_FILE}"
+        cp -r "/var/backups/cloudvps-boss.$$/cloudvps-boss/${CONF_FILE}" "/etc/cloudvps-boss-v3/${CONF_FILE}"
     fi
 done
 
@@ -311,14 +311,14 @@ done
 # Hostname is used as the Object Store Container
 HOSTNAME="$(get_hostname)"
 # get and set the hostname in the config. Fails if config is chattr +i.
-sed -i "s/replace_me/${HOSTNAME}/g" /etc/cloudvps-boss/backup.conf
+sed -i "s/replace_me/${HOSTNAME}/g" /etc/cloudvps-boss-v3/backup.conf
 
 if [[ ! -d "/etc/cron.d" ]]; then
     mkdir -p "/etc/cron.d"
 fi
 
 if [[ ! -f "/etc/cron.d/cloudvps-boss" ]]; then
-    mv "/etc/cloudvps-boss/cloudvps-boss.cron" "/etc/cron.d/cloudvps-boss"
+    mv "/etc/cloudvps-boss-v3/cloudvps-boss.cron" "/etc/cron.d/cloudvps-boss"
     if [[ "$?" -ne 0 ]]; then
         lerror "Cannot place cronjob in /etc/cron.d."
     fi
@@ -336,20 +336,20 @@ if [[ ! -d "/usr/local/bin" ]]; then
 fi
 
 for COMMAND in "cloudvps-boss.sh" "cloudvps-boss-cleanup.sh" "cloudvps-boss-list.sh" "cloudvps-boss-restore.sh" "cloudvps-boss-stats.sh" "cloudvps-boss-update.sh" "cloudvps-boss-verify.sh"; do
-    log "Creating symlink for /etc/cloudvps-boss/${COMMAND} in /usr/local/bin/${COMMAND%.sh}."
-    chmod +x "/etc/cloudvps-boss/${COMMAND}"
-    ln -fs "/etc/cloudvps-boss/${COMMAND}" "/usr/local/bin/${COMMAND%.sh}"
+    log "Creating symlink for /etc/cloudvps-boss-v3/${COMMAND} in /usr/local/bin/${COMMAND%.sh}."
+    chmod +x "/etc/cloudvps-boss-v3/${COMMAND}"
+    ln -fs "/etc/cloudvps-boss-v3/${COMMAND}" "/usr/local/bin/${COMMAND%.sh}"
 done
 
 for FILE in "pre-backup.d/30-mysql_backup.sh" "post-backup.d/10-upload-completed-status.sh" "pre-backup.d/10-upload-starting-status.sh" "pre-backup.d/20-lockfile_check.sh" "post-fail-backup.d/10-upload-fail-status.sh" "post-fail-backup.d/20-failure-notify.sh"; do
     # make sure all files are executable
-    chmod +x "/etc/cloudvps-boss/${FILE}"
+    chmod +x "/etc/cloudvps-boss-v3/${FILE}"
 done
 
 echo
 lecho "If you want to receive email notifications of issues, please install"
 lecho "a mailserver and add email addresses, one per line, to the following"
-lecho "file: /etc/cloudvps-boss/email.conf"
+lecho "file: /etc/cloudvps-boss-v3/email.conf"
 echo
 lecho "CloudVPS Boss installation completed."
 echo

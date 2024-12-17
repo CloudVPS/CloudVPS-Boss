@@ -9,11 +9,11 @@
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Lockfile Check ${VERSION}"
 
-if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/common.sh"
+if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/common.sh"
     exit 1
 fi
-source /etc/cloudvps-boss/common.sh
+source /etc/cloudvps-boss-v3/common.sh
 
 DUPLICITY_LOCKFILE="$(find /root/.cache/duplicity -iname '*.lock' 2>&1 | head -n 1)"
 
@@ -46,10 +46,10 @@ MAIL
 }
 
 send_greater_than_24hour_mail() {
-    if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
+    if [[ -f "/etc/cloudvps-boss-v3/email.conf" ]]; then
         while read recipient; do
              greater_than_24hour_mail
-        done < /etc/cloudvps-boss/email.conf
+        done < /etc/cloudvps-boss-v3/email.conf
     else
         lerror "No email file found. Not mailing"
     fi
@@ -86,10 +86,10 @@ MAIL
 }
 
 send_less_than_24hour_mail() {
-    if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
+    if [[ -f "/etc/cloudvps-boss-v3/email.conf" ]]; then
         while read recipient; do
              less_than_24hour_mail
-        done < /etc/cloudvps-boss/email.conf
+        done < /etc/cloudvps-boss-v3/email.conf
     else
         lerror "No email file found. Not mailing"
     fi
@@ -125,7 +125,7 @@ if [[ ! -z "${DUPLICITY_LOCKFILE}" ]]; then
                 fi
             else
                 echo "Duplicity is still running. Seems OK."
-                touch /etc/cloudvps-boss/status/24h
+                touch /etc/cloudvps-boss-v3/status/24h
                 send_less_than_24hour_mail
             fi
         fi

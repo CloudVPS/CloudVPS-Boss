@@ -9,15 +9,15 @@
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Failure Notify ${VERSION}"
 
-if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/common.sh"
+if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/common.sh"
     exit 1
 fi
-source /etc/cloudvps-boss/common.sh
+source /etc/cloudvps-boss-v3/common.sh
 
-if [[ -f "/etc/cloudvps-boss/status/24h" ]]; then
+if [[ -f "/etc/cloudvps-boss-v3/status/24h" ]]; then
     lecho "24 hour backup file found. Not sending email, removing file."
-    rm "/etc/cloudvps-boss/status/24h"
+    rm "/etc/cloudvps-boss-v3/status/24h"
     exit 0
 fi
 
@@ -73,10 +73,10 @@ CloudVPS Boss
 MAIL
 }
 
-if [[ -f "/etc/cloudvps-boss/email.conf" ]]; then
+if [[ -f "/etc/cloudvps-boss-v3/email.conf" ]]; then
     while read recipient; do
          errormail
-    done < /etc/cloudvps-boss/email.conf
+    done < /etc/cloudvps-boss-v3/email.conf
 else
     lerror "No email file found. Not mailing"
 fi

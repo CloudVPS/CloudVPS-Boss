@@ -9,11 +9,11 @@
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Uninstall ${VERSION}"
 
-if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/common.sh"
+if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/common.sh"
     exit 1
 fi
-source /etc/cloudvps-boss/common.sh
+source /etc/cloudvps-boss-v3/common.sh
 
 read -p "Would you like to completely remove CloudVPS Boss? Your backups will NOT be removed. [y/N]? " choice
 
@@ -33,7 +33,7 @@ if [[ "${choice}" = "y" ]]; then
             fi
         done
     done
-    for FOLDER in "/usr/local/cloudvps-boss"  "/etc/cloudvps-boss/"; do
+    for FOLDER in "/usr/local/cloudvps-boss"  "/etc/cloudvps-boss-v3/"; do
         remove_folder "${FOLDER}"
     done
     cd

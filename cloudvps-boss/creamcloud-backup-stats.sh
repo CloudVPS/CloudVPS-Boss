@@ -9,11 +9,11 @@
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Stats ${VERSION}"
 
-if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/common.sh"
+if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/common.sh"
     exit 1
 fi
-source /etc/cloudvps-boss/common.sh
+source /etc/cloudvps-boss-v3/common.sh
 
 USED="$(swift stat --lh ${HOSTNAME} 2>&1 | awk '/Bytes/ { print $2}' | grep -v -e Warning -e pkg_resources -e oslo)"
 
@@ -31,7 +31,7 @@ OLD_IFS="${IFS}"
 IFS=$'\n'
 RESTIC_OUTPUT=$(restic snapshots \
     --repo ${BACKUP_BACKEND} \
-    --password-file=/etc/cloudvps-boss/restic-password.conf \
+    --password-file=/etc/cloudvps-boss-v3/restic-password.conf \
     --cleanup-cache \
     --verbose=1 2>&1 | grep -v -e Warning -e pkg_resources -e oslo -e tar -e attr -e kwargs)
 for line in ${RESTIC_OUTPUT}; do

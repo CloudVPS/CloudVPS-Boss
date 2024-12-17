@@ -9,11 +9,11 @@
 VERSION="2.0.0"
 TITLE="CloudVPS Boss File Overview ${VERSION}"
 
-if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/common.sh"
+if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/common.sh"
     exit 1
 fi
-source /etc/cloudvps-boss/common.sh
+source /etc/cloudvps-boss-v3/common.sh
 
 if [[ -n "$1" ]]; then
     TIME="$1"

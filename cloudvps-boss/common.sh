@@ -44,31 +44,31 @@ if [[ "${EUID}" -ne 0 ]]; then
    exit 1
 fi
 
-if [[ ! -f "/etc/cloudvps-boss/v3-auth.conf" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/v3-auth.conf."
+if [[ ! -f "/etc/cloudvps-boss-v3/v3-auth.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/v3-auth.conf."
     exit 1
 fi
-if [[ ! -f "/etc/cloudvps-boss/backup.conf" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/backup.conf."
+if [[ ! -f "/etc/cloudvps-boss-v3/backup.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/backup.conf."
     exit 1
 fi
-if [[ ! -f "/etc/cloudvps-boss/restic-password.conf" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/restic-password.conf."
+if [[ ! -f "/etc/cloudvps-boss-v3/restic-password.conf" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/restic-password.conf."
     exit 1
 fi
 
-CONTAINER_NAME="cloudvps-boss"
+CONTAINER_NAME="cloudvps-boss-v3"
 BACKUP_BACKEND="swift:${CONTAINER_NAME}:/"
 
-source /etc/cloudvps-boss/v3-auth.conf
-source /etc/cloudvps-boss/backup.conf
+source /etc/cloudvps-boss-v3/v3-auth.conf
+source /etc/cloudvps-boss-v3/backup.conf
 
 TMP="${TEMPDIR}"
 TEMP="${TEMPDIR}"
 TMPDIR="${TEMPDIR}"
 
-if [[ -f "/etc/cloudvps-boss/custom.conf" ]]; then
-    source "/etc/cloudvps-boss/custom.conf"
+if [[ -f "/etc/cloudvps-boss-v3/custom.conf" ]]; then
+    source "/etc/cloudvps-boss-v3/custom.conf"
     logger -t "cloudvps-boss" -- "Custom Configuration Loaded"
 fi
 
@@ -185,8 +185,8 @@ get_file() {
     fi
 }
 
-if [[ ! -d "/etc/cloudvps-boss/status/${HOSTNAME}" ]]; then
-    mkdir -p "/etc/cloudvps-boss/status/${HOSTNAME}"
+if [[ ! -d "/etc/cloudvps-boss-v3/status/${HOSTNAME}" ]]; then
+    mkdir -p "/etc/cloudvps-boss-v3/status/${HOSTNAME}"
     if [[ $? -ne 0 ]]; then
         lerror "Cannot create status folder"
         exit 1
@@ -196,7 +196,7 @@ if [[ ! -d "/etc/cloudvps-boss/status/${HOSTNAME}" ]]; then
     IFS=$'\n'
     RESTIC_OUTPUT=$(restic init / \
         --repo ${BACKUP_BACKEND} \
-        --password-file=/etc/cloudvps-boss/restic-password.conf \
+        --password-file=/etc/cloudvps-boss-v3/restic-password.conf \
         --verbose=1 2>&1 | grep -v -e Warning -e pkg_resources -e oslo -e attr -e kwargs)
 
     if [[ $? -ne 0 ]]; then

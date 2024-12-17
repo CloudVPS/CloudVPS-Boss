@@ -9,16 +9,16 @@
 VERSION="2.0.0"
 TITLE="CloudVPS Boss Backup ${VERSION}"
 
-if [[ ! -f "/etc/cloudvps-boss/common.sh" ]]; then
-    lerror "Cannot find /etc/cloudvps-boss/common.sh"
+if [[ ! -f "/etc/cloudvps-boss-v3/common.sh" ]]; then
+    lerror "Cannot find /etc/cloudvps-boss-v3/common.sh"
     exit 1
 fi
-source /etc/cloudvps-boss/common.sh
+source /etc/cloudvps-boss-v3/common.sh
 
 lecho "${TITLE} started on ${HOSTNAME} at $(date)."
 echo
-lecho "Running pre-backup scripts from /etc/cloudvps-boss/pre-backup.d/"
-for SCRIPT in /etc/cloudvps-boss/pre-backup.d/*; do
+lecho "Running pre-backup scripts from /etc/cloudvps-boss-v3/pre-backup.d/"
+for SCRIPT in /etc/cloudvps-boss-v3/pre-backup.d/*; do
     if [[ ! -d "${SCRIPT}" ]]; then
         if [[ -x "${SCRIPT}" ]]; then
             log "${SCRIPT}"
@@ -34,15 +34,15 @@ echo
 lecho "Create full backup if last full backup is older than: ${FULL_IF_OLDER_THAN} and keep at max ${FULL_TO_KEEP} full backups."
 lecho "Starting Restic"
 
-lecho "restic backup / --repo ${BACKUP_BACKEND} --exclude-file=/etc/cloudvps-boss/exclude.conf --exclude-caches --password-file=/etc/cloudvps-boss/restic-password.conf --cleanup-cache --verbose=1"
+lecho "restic backup / --repo ${BACKUP_BACKEND} --exclude-file=/etc/cloudvps-boss-v3/exclude.conf --exclude-caches --password-file=/etc/cloudvps-boss-v3/restic-password.conf --cleanup-cache --verbose=1"
 
 OLD_IFS="${IFS}"
 IFS=$'\n'
 RESTIC_OUTPUT=$(restic backup / \
     --repo ${BACKUP_BACKEND} \
-    --exclude-file=/etc/cloudvps-boss/exclude.conf \
+    --exclude-file=/etc/cloudvps-boss-v3/exclude.conf \
     --exclude-caches \
-    --password-file=/etc/cloudvps-boss/restic-password.conf \
+    --password-file=/etc/cloudvps-boss-v3/restic-password.conf \
     --cleanup-cache \
     --verbose=1 2>&1 | grep -v -e Warning -e pkg_resources -e oslo -e attr -e kwargs)
 
@@ -51,8 +51,8 @@ if [[ $? -eq 1 ]]; then
             lerror ${line}
     done
     lerror "CloudVPS Boss Backup to Object Store FAILED!. Please check server ${HOSTNAME}."
-    lerror "Running post-fail-backup scripts from /etc/cloudvps-boss/post-fail-backup.d/"
-    for SCRIPT in /etc/cloudvps-boss/post-fail-backup.d/*; do
+    lerror "Running post-fail-backup scripts from /etc/cloudvps-boss-v3/post-fail-backup.d/"
+    for SCRIPT in /etc/cloudvps-boss-v3/post-fail-backup.d/*; do
         if [[ ! -d "${SCRIPT}" ]]; then
             if [[ -x "${SCRIPT}" ]]; then
                 "${SCRIPT}" || lerror "Post fail backup script ${SCRIPT} failed."
@@ -69,13 +69,13 @@ IFS="${OLD_IFS}"
 
 echo
 lecho "CloudVPS Boss Cleanup ${VERSION} started on $(date). Removing all and keep ${KEEP_DAILY} daily backups and ${KEEP_WEEKLY} weekly backups."
-lecho "restic forget --repo ${BACKUP_BACKEND} --password-file=/etc/cloudvps-boss/restic-password.conf --keep-daily=${KEEP_DAILY} --keep-weekly=${KEEP_WEEKLY} --cleanup-cache --verbose=1"
+lecho "restic forget --repo ${BACKUP_BACKEND} --password-file=/etc/cloudvps-boss-v3/restic-password.conf --keep-daily=${KEEP_DAILY} --keep-weekly=${KEEP_WEEKLY} --cleanup-cache --verbose=1"
 
 OLD_IFS="${IFS}"
 IFS=$'\n'
 RESTIC_OUTPUT=$(restic forget \
     --repo ${BACKUP_BACKEND} \
-    --password-file=/etc/cloudvps-boss/restic-password.conf \
+    --password-file=/etc/cloudvps-boss-v3/restic-password.conf \
     --keep-daily=${KEEP_DAILY} \
     --keep-weekly=${KEEP_WEEKLY} \
     --cleanup-cache \
@@ -94,8 +94,8 @@ done
 IFS="${OLD_IFS}"
 
 echo
-lecho "Running post-backup scripts from /etc/cloudvps-boss/post-backup.d/"
-for SCRIPT in /etc/cloudvps-boss/post-backup.d/*; do
+lecho "Running post-backup scripts from /etc/cloudvps-boss-v3/post-backup.d/"
+for SCRIPT in /etc/cloudvps-boss-v3/post-backup.d/*; do
     if [[ ! -d "${SCRIPT}" ]]; then
         if [[ -x "${SCRIPT}" ]]; then
             "${SCRIPT}" || lerror "Post backup script ${SCRIPT} failed."
