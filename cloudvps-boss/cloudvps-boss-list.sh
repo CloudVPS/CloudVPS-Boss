@@ -26,16 +26,9 @@ lecho "Start of CloudVPS Boss File Overview"
 lecho "Hostname: ${HOSTNAME}"
 lecho "$TIME_MESS"
 echo "-----------------------------------------"
-lecho "duplicity list-current-files --file-prefix=\"${HOSTNAME}.\" --name=\"${HOSTNAME}.\" ${ENCRYPTION_OPTIONS} ${CUSTOM_DUPLICITY_OPTIONS} --allow-source-mismatch --num-retries 100 ${TIMEOPT} ${BACKUP_BACKEND}"
-duplicity list-current-files \
-    --file-prefix="${HOSTNAME}." \
-    --name="${HOSTNAME}." \
-    ${ENCRYPTION_OPTIONS} \
-    ${CUSTOM_DUPLICITY_OPTIONS} \
-    --allow-source-mismatch \
-    --num-retries 100 \
-    ${TIMEOPT} \
-    ${BACKUP_BACKEND} 2>&1 | grep -v -e Warning -e pkg_resources -e oslo
+echo ""
+restic snapshots --repo ${BACKUP_BACKEND} --password-file=/etc/cloudvps-boss-v3/restic-password.conf --verbose=1
+echo ""
 lecho "End of CloudVPS Boss File Overview"
 echo "========================================="
 
